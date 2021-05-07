@@ -1,27 +1,37 @@
 import json
 
 from flask import Flask, jsonify, request
+import os
 import pdfkit
 import base64
 import requests
 
-app = Flask(__name__)
+htmltopdf = Flask(__name__)
 
+ROOT_PREFIX = '/' + os.path.dirname(os.path.realpath(__file__)).rsplit('\\', 1)[-1]
 
-@app.route('/api/download_pdfs/', methods=['POST'])
+@htmltopdf.route('/')
+def index():
+    return "Hola"
+
+@htmltopdf.route('/api/download_pdfs/', methods=['POST'])
 def download_pdfs_api():
     content = request.json
     documents = content['documents']
-    files = download_pdfs(documents)
+    user = content['user']
+    password = content['password']
+    if not password or not user:
+        return jsonify(error='Usuario y contraseña no enviado'), 400
+    files = download_pdfs(documents, user, password)
     result = {"result": files}
     return jsonify(result)
 
 
-def download_pdfs(documents):
+def download_pdfs(documents, user, password):
     s = requests.session()
     login_data = {
-        'login': '7808800014004',
-        'password': 'Alimpsaexcell2021'
+        'login': user,
+        'password': password
     }
     s.post('https://www.comercionet.cl/usuarios/login.php', data=login_data)
     result = []
@@ -42,4 +52,4 @@ def download_pdfs(documents):
 
 
 if __name__ == '__main__':
-    app.run()
+    htmltopdf.run(debug=True)
