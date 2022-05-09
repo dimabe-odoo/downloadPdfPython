@@ -29,6 +29,7 @@ def download_pdfs_api():
 
 def download_pdfs(documents, user, password):
     s = requests.session()
+    s.verify = False
     login_data = {
         'login': user,
         'password': password
@@ -52,4 +53,4 @@ def download_pdfs(documents, user, password):
 
 
 if __name__ == '__main__':
-    htmltopdf.run(debug=True)
+    htmltopdf.run()
